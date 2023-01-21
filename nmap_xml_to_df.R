@@ -3,16 +3,16 @@ library(tibble)
 
 nmap_xml_file <- "~/Downloads/nmap_example.xml"
 
-# parse the xml file
+
 nmap_data <- xml2::read_xml(nmap_xml_file)
 
-# extract the relevant data
+
 hosts_data <- xml2::xml_find_all(nmap_data, "//host")
 
-# create a list to store the dataframes for each host
+
 df_list <- list()
 
-# loop through the host data to extract the information for each host
+
 for (i in 1:length(hosts_data)) {
   
   host_data <- hosts_data[i]
@@ -39,7 +39,6 @@ for (i in 1:length(hosts_data)) {
     }
   }
   
-  # combine the extracted data into a dataframe
   host_df <- tibble::data_frame(
     host = rep(host_ip_address, length(open_ports)),
     hostname = rep(hostname, length(open_ports)),
@@ -50,5 +49,4 @@ for (i in 1:length(hosts_data)) {
   df_list[[i]] <- host_df
 }
 
-# access the dataframe for a specific host
 print(df_list)
