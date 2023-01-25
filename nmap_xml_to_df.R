@@ -1,7 +1,7 @@
 library(xml2)
 library(tibble)
 
-nmap_xml_file <- "~/Downloads/nmap_example.xml"
+nmap_xml_file <- "data/nmap_example.xml"
 
 
 nmap_data <- xml2::read_xml(nmap_xml_file)
@@ -18,7 +18,7 @@ for (i in 1:length(hosts_data)) {
   host_data <- hosts_data[i]
   host_ip_address <- xml2::xml_text(xml2::xml_find_first(host_data, "address[@addrtype='ipv4']/@addr"))
   
-  hostname <- xml2::xml_text(xml2::xml_find_first(host_data, "//hostname/@name"))
+  hostname <- xml2::xml_text(xml2::xml_find_first(host_data, "hostnames/hostname/@name"))
   
   open_ports_data <- xml2::xml_find_all(host_data, "ports/port[state[@state='open']]")
   open_ports <- sapply(open_ports_data, function(x) {
