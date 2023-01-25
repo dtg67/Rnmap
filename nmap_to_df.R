@@ -16,16 +16,25 @@ PORT      STATE SERVICE
 54172/tcp open  unknown"
 
 # Extract the relevant information and store it in a data frame
-nmap_df <- nmap_output %>% 
-  # Split the string into lines
-  strsplit("\n") %>% 
-  # Extract the lines containing port information
-  .[[1]] %>% .[grepl("^[0-9]", .)] %>% 
-  # Split each line into columns
+nmap_line_split <- nmap_output %>% 
+  strsplit("\n")
+
+hostname <- nmap_line_split %>% 
+  .[[1]] %>% 
+  .[1] %>% 
+  str_extract(., "(?<=for\\s)(.*)(?=\\()") %>%
+  trimws(., which = c("right"))
+
+ip_address <- nmap_line_split %>%
+  .[[1]] %>%
+  .[1] %>%
+  str_extract(., "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})")
+
+nmap_df <- nmap_line_split %>% 
+  .[[1]] %>% 
+  .[grepl("^[0-9]", .)] %>% 
   strsplit("[ \t]+") %>% 
-  # Store the columns in a data frame
   as.data.frame() %>% 
-  # Rename the columns
   setNames(c("port", "state", "service"))
 
 # Print the resulting data frame
