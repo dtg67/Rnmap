@@ -20,12 +20,13 @@ for (i in 1:length(hosts_data)) {
   
   hostname <- xml2::xml_text(xml2::xml_find_first(host_data, "hostnames/hostname/@name"))
   
-  open_ports_data <- xml2::xml_find_all(host_data, "ports/port[state[@state='open']]")
+  open_ports_data <- xml2::xml_find_all(host_data, "ports/port[state]")
   open_ports <- sapply(open_ports_data, function(x) {
     xml2::xml_text(xml2::xml_find_first(x, "@portid"))
   })
   
-  open_service <- c()
+  service <- c()
+  status <- xml2::xml_text(xml2::xml_find_all(host_data, "ports/port/state/@state"))
   
   for(j in 1:length(open_ports)){
     base_str <- "ports/port[@portid = 'replace me']//service"
@@ -33,9 +34,11 @@ for (i in 1:length(hosts_data)) {
     xml_port_string <- str_replace(base_str, "replace me", replace)
     services_data <- xml2::xml_find_all(host_data, xml_port_string)
     name <- xml2::xml_text(xml2::xml_find_first(services_data, "@name"))
+    
     if(length(name) == 0){open_service[j] == "NA"}
     else{
-      open_service[j] <- name
+      service[j] <- name
+      
     }
   }
   
@@ -43,7 +46,8 @@ for (i in 1:length(hosts_data)) {
     host = rep(host_ip_address, length(open_ports)),
     hostname = rep(hostname, length(open_ports)),
     port = open_ports,
-    service = open_service
+    status = status,
+    service = service
   )
   
   df_list[[i]] <- host_df
